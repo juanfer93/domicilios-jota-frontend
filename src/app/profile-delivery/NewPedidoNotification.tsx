@@ -4,15 +4,17 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ensureBrowserNotificationPermission,
-  listenNotifications,
   notifyNewPedidoBrowser,
 } from "@/lib/notifications";
+import { getCurrentDelivery } from "@/lib/api";
 import { useAuthStore } from "@/store/UseAuthStore";
 
 type NewPedidoState = {
   pedidoId: string;
   createdAt: number;
 } | null;
+
+const POLL_INTERVAL_MS = 3000; 
 
 export function NewPedidoNotification() {
   const router = useRouter();
@@ -21,23 +23,54 @@ export function NewPedidoNotification() {
     !!user && user.rol && user.rol.toLowerCase() === "domiciliario";
 
   const [pedido, setPedido] = useState<NewPedidoState>(null);
+  const [lastPedidoId, setLastPedidoId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isDomiciliario || !user) return;
 
-    const unsubscribe = listenNotifications((message) => {
-      if (
-        message.type === "NEW_PEDIDO" &&
-        message.targetUserId === user.id
-      ) {
-        setPedido({
-          pedidoId: message.pedidoId,
-          createdAt: message.createdAt,
-        });
-      }
-    });
+    let isMounted = true;
+    let intervalId: ReturnType<typeof setInterval>;
 
-    return unsubscribe;
+    const checkCurrentDelivery = async () => {
+      try {
+        const current = await getCurrentDelivery();
+        const currentId = current?.id ?? null;
+
+        if (!isMounted) return;
+
+        setLastPedidoId((prevId) => {
+
+          if (prevId === null && currentId !== null) {
+            return currentId;
+          }
+
+          if (currentId && currentId !== prevId) {
+            setPedido({
+              pedidoId: currentId,
+              createdAt: Date.now(),
+            });
+            return currentId;
+          }
+
+          if (!currentId) {
+            return null;
+          }
+
+          return prevId;
+        });
+      } catch {
+        if (!isMounted) return;
+        setLastPedidoId(null);
+      }
+    };
+
+    checkCurrentDelivery();
+    intervalId = setInterval(checkCurrentDelivery, POLL_INTERVAL_MS);
+
+    return () => {
+      isMounted = false;
+      if (intervalId) clearInterval(intervalId);
+    };
   }, [isDomiciliario, user]);
 
   useEffect(() => {
@@ -54,7 +87,7 @@ export function NewPedidoNotification() {
 
   return (
     <div className="fixed inset-x-0 bottom-4 z-50 flex justify-center px-4">
-      <div className="w-full max-w-lg rounded-2xl bg-[#174A8B] text-[#FFF9E8] px-4 py-3 shadow-xl border border-[#F5E9C8]/60 flex items-start gap-3">
+      <div className="w-full max-w-lg rounded-2xl bg-[#174A8B] text-[#FFF9E8] shadow-xl border border-[#F5E9C8]/60 flex items-start gap-3">
         <div className="h-10 w-10 rounded-full bg-[#F5E9C8] text-[#174A8B] flex items-center justify-center font-extrabold text-sm">
           !
         </div>

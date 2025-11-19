@@ -11,7 +11,6 @@ import {
   type DomiciliarioItem,
   type ComercioItem,
 } from "@/lib/api";
-import { sendNewPedidoNotification } from "@/lib/notifications";
 import { getApiErrorMessage } from "@/lib/apiUtils";
 
 type DeliveryTab = "today" | "history" | "create";
@@ -221,9 +220,6 @@ export const useDeliveryStore = create<DeliveryState>((set, get) => ({
       });
 
       set({ statusCreate: "success" as Status });
-      setTimeout(() => {
-        sendNewPedidoNotification(selectedDomiciliarioId, pedido.id);
-      }, 3000);
       await get().loadPedidosHoy();
       get().resetCreate();
       return pedido;
