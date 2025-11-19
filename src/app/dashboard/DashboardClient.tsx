@@ -11,6 +11,7 @@ import { DomiciliariosModal } from "./DomiciliariosModal";
 import { DeleteDomiciliarioModal } from "./DeleteDomiciliarioModal";
 import { ComerciosModal } from "./ComerciosModal";
 import { DeleteComercioModal } from "./DeleteComercioModal";
+import { useDeliveryStore } from "@/store/useDeliveryStore";
 
 type Props = {
   adminName: string;
@@ -35,6 +36,7 @@ export function DashboardClient({ adminName }: Props) {
     deleteComercio,
   } = useComerciosStore();
   const { summary, loading, error, fetchSummary, reset } = useDashboardStore();
+  const { pedidosHoy, loadPedidosHoy } = useDeliveryStore();
   const [closeSession, setCloseSession] = useState(false);
   const [createDomi, setCreateDomi] = useState(false);
   const [showDomisModal, setShowDomisModal] = useState(false);
@@ -43,7 +45,7 @@ export function DashboardClient({ adminName }: Props) {
   const [comercioToDelete, setComercioToDelete] = useState<ComercioItem | null>(null);
 
 
-  const totalPedidos = summary?.totalPedidos ?? 0;
+  const totalPedidos = pedidosHoy.length;
   const totalDomiciliarios = summary?.totalDomiciliarios ?? 0;
   const totalComercios = summary?.totalComercios ?? 0;
 
@@ -108,6 +110,13 @@ export function DashboardClient({ adminName }: Props) {
       router.replace("/login");
     }
   }, [isAuthenticated, clearAuth, router, reset]);
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      loadPedidosHoy();
+    }
+  }, [isAuthenticated, loadPedidosHoy]);
+
 
   useEffect(() => {
     if (isAuthenticated()) {
@@ -236,9 +245,9 @@ export function DashboardClient({ adminName }: Props) {
               flex flex-col justify-between
               text-left
             "
->
+          >
             <span className="text-[10px] sm:text-xs uppercase tracking-[0.18em] text-[#F5E9C8]/70">
-              Pedidos
+              Pedidos de hoy
             </span>
 
             {loading ? (
