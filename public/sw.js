@@ -1,27 +1,11 @@
-/* eslint-disable no-restricted-globals */
-const NOTIFICATION_TITLE = "Nuevo pedido";
-const NOTIFICATION_OPTIONS = {
-  body: "Toca para ver el pedido en curso.",
-  icon: "/favicon.ico",
-};
-
 self.addEventListener("push", (event) => {
-  let data = {};
+  const data = event.data ? event.data.json() : {};
 
-  try {
-    data = event.data ? event.data.json() : {};
-  } catch (error) {
-    // If payload is not JSON, fallback to text.
-    data = { body: event.data?.text() };
-  }
-
-  const title = data.title || NOTIFICATION_TITLE;
+  const title = data.title || "Notificación";
   const options = {
-    ...NOTIFICATION_OPTIONS,
-    ...data,
-    data: {
-      url: data.url || "/profile-delivery/current-delivery",
-    },
+    body: data.body || "",
+    icon: data.icon || "/favicon.ico",
+    data: { url: data.url || "/" },
   };
 
   event.waitUntil(self.registration.showNotification(title, options));
@@ -29,18 +13,21 @@ self.addEventListener("push", (event) => {
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const destination = event.notification.data?.url || "/profile-delivery/current-delivery";
+  const url = event.notification?.data?.url || "/";
 
   event.waitUntil(
-    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
-      const matchingClient = clientList.find((client) => client.url.includes(destination));
+    (async () => {
+      const allClients = await clients.matchAll({ type: "window", includeUncontrolled: true });
 
-      if (matchingClient) {
-        matchingClient.focus();
-        return;
+      for (const client of allClients) {
+        if ("focus" in client) {
+          client.focus();
+          client.navigate(url);
+          return;
+        }
       }
 
-      return self.clients.openWindow(destination);
-    })
+      await clients.openWindow(url);
+    })()
   );
 });

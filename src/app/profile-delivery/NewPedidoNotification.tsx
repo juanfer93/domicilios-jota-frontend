@@ -7,7 +7,8 @@ import {
   ensurePushSubscription,
   notifyNewPedidoBrowser,
 } from "@/lib/notifications";
-import { getCurrentDelivery } from "@/lib/api";
+import { api, getCurrentDelivery } from "@/lib/api";
+import { getAuthHeaders } from "@/lib/GetAuthHeaders";
 import { useAuthStore } from "@/store/UseAuthStore";
 
 type NewPedidoState = {
@@ -19,7 +20,10 @@ const POLL_INTERVAL_MS = 3000;
 
 export function NewPedidoNotification() {
   const router = useRouter();
+
   const user = useAuthStore((state) => state.user);
+  const token = useAuthStore((state) => state.token);
+
   const isDomiciliario =
     !!user && user.rol && user.rol.toLowerCase() === "domiciliario";
 
@@ -40,7 +44,6 @@ export function NewPedidoNotification() {
         if (!isMounted) return;
 
         setLastPedidoId((prevId) => {
-
           if (prevId === null && currentId !== null) {
             return currentId;
           }
@@ -81,9 +84,22 @@ export function NewPedidoNotification() {
 
   useEffect(() => {
     if (!isDomiciliario) return;
+
+    if (!token) {
+      ensureBrowserNotificationPermission(); // igual pide permiso
+      return;
+    }
+
     ensureBrowserNotificationPermission();
-    ensurePushSubscription();
-  }, [isDomiciliario]);
+
+    ensurePushSubscription(async (subscription) => {
+      await api.post(
+        "/api/v1/notifications/subscribe",
+        subscription.toJSON(),
+        { headers: { ...getAuthHeaders() } }
+      );
+    });
+  }, [isDomiciliario, token]);
 
   if (!pedido) return null;
 
