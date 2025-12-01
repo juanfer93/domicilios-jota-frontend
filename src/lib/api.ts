@@ -6,16 +6,17 @@ export const api = axios.create({
 
 export interface AdminStatus {
   hasAdmin: boolean;
+  adminName?: string | null
 }
 
 export interface CreateAdminPayload {
-  name: string;
+  nombre: string;
   email: string;
   password: string;
 }
 
 export const getAdminStatus = async (): Promise<AdminStatus> => {
-  const { data } = await api.get<AdminStatus>("/users/admin-status");
+  const { data } = await api.get<AdminStatus>("/api/v1/users/admin-status");
   return data;
 };
 
@@ -25,6 +26,6 @@ export const createAdmin = async (payload: CreateAdminPayload) => {
     rol: "admin", 
   };
 
-  const { data } = await api.post("/users/admin", body);
+  const { data } = await api.post("/api/v1/users/admin", body);
   return data;
 };

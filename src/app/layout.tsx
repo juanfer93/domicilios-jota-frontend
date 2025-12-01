@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Jota Domicilios",
+  title: "Jota Delivery",
   description:
     "Asistente inicial para verificar y crear el administrador del sistema de pedidos.",
 };
