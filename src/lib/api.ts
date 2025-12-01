@@ -20,6 +20,6 @@ export const getAdminStatus = async (): Promise<AdminStatus> => {
 };
 
 export const createAdmin = async (payload: CreateAdminPayload) => {
-  const { data } = await api.post("/users/admin", payload);
+  const { data } = await api.post("/usuarios/admin", payload);
   return data;
 };
