@@ -15,7 +15,7 @@ export interface CreateAdminPayload {
 }
 
 export const getAdminStatus = async (): Promise<AdminStatus> => {
-  const { data } = await api.get<AdminStatus>("/usuarios/admin-status");
+  const { data } = await api.get<AdminStatus>("/usuarios/users/admin-status");
   return data;
 };
 
