@@ -15,11 +15,16 @@ export interface CreateAdminPayload {
 }
 
 export const getAdminStatus = async (): Promise<AdminStatus> => {
-  const { data } = await api.get<AdminStatus>("/usuarios/users/admin-status");
+  const { data } = await api.get<AdminStatus>("/users/admin-status");
   return data;
 };
 
 export const createAdmin = async (payload: CreateAdminPayload) => {
-  const { data } = await api.post("/usuarios/admin", payload);
+  const body = {
+    ...payload,
+    rol: "admin", 
+  };
+
+  const { data } = await api.post("/users/admin", body);
   return data;
 };
