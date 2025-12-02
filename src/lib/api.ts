@@ -15,6 +15,11 @@ export interface CreateAdminPayload {
   password: string;
 }
 
+export interface DashboardSummary {
+  totalPedidos: number;
+  totalDomiciliarios: number;
+}
+
 export const getAdminStatus = async (): Promise<AdminStatus> => {
   const { data } = await api.get<AdminStatus>("/api/v1/users/admin-status");
   return data;
@@ -29,3 +34,10 @@ export const createAdmin = async (payload: CreateAdminPayload) => {
   const { data } = await api.post("/api/v1/users/admin", body);
   return data;
 };
+
+export const getDashboardSummary = async (): Promise<DashboardSummary> => {
+  const { data } = await api.get<DashboardSummary>(
+    "/api/v1/users/dashboard-summary"
+  );
+  return data;
+}

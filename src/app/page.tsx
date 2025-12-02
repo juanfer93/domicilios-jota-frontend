@@ -8,6 +8,6 @@ export default async function Home() {
     redirect("/create-admin");
   }
 
-  redirect("/welcome");
+  redirect("/dashboard");
 }
 

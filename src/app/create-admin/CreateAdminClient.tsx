@@ -57,7 +57,7 @@ export function CreateAdminClient() {
         password: data.password,
       });
 
-      router.replace("/welcome");
+      router.replace("/dashboard");
     } catch (err) {
       console.error("Error creando admin", err);
       setServerError("No se pudo crear el administrador. Intenta de nuevo.");

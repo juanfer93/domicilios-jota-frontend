@@ -6,7 +6,7 @@ export default async function CreateAdminPage() {
   const { hasAdmin } = await fetchAdminStatus();
 
   if (hasAdmin) {
-    redirect("/welcome");
+    redirect("/dashboard");
   }
 
   return <CreateAdminClient />;

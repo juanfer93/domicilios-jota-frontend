@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { fetchAdminStatus } from "@/lib/adminStatusServer";
-import { WelcomeClient } from "./WelcomeClient";
+import { DashboardClient } from "./DashboardClient";
 
 export default async function WelcomePage() {
   const { hasAdmin, adminName } = await fetchAdminStatus();
@@ -9,6 +9,6 @@ export default async function WelcomePage() {
     redirect("/create-admin");
   }
 
-  return <WelcomeClient adminName={adminName ?? "Administrador"} />;
+  return <DashboardClient adminName={adminName ?? "Administrador"} />;
 }
 
