@@ -20,6 +20,21 @@ export interface DashboardSummary {
   totalDomiciliarios: number;
 }
 
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  accessToken: string;
+  usuario: {
+    id: string;
+    nombre: string;
+    email: string;
+    rol: string;
+  };
+}
+
 export const getAdminStatus = async (): Promise<AdminStatus> => {
   const { data } = await api.get<AdminStatus>("/api/v1/users/admin-status");
   return data;
@@ -34,6 +49,14 @@ export const createAdmin = async (payload: CreateAdminPayload) => {
   const { data } = await api.post("/api/v1/users/admin", body);
   return data;
 };
+
+export const login = async (payload: LoginPayload) => {
+  const { data } = await api.post("/api/v1/auth/login", payload);
+
+  const payloadData = (data as any)?.data ?? data;
+
+  return payloadData as LoginResponse
+}
 
 export const getDashboardSummary = async (): Promise<DashboardSummary> => {
   const { data } = await api.get<DashboardSummary>(
