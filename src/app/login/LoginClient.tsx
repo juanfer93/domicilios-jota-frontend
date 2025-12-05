@@ -91,12 +91,8 @@ export function LoginClient() {
                 Jota Jota Delivery
               </p>
               <h1 className="text-2xl font-semibold leading-tight text-[#F5E9C8]">
-                Iniciar sesión como administrador
+                Iniciar sesión
               </h1>
-              <p className="text-sm text-[#F5E9C8]/80">
-                Ingresa con el correo y contraseña del administrador para
-                acceder al panel.
-              </p>
             </div>
           </div>
         </header>
@@ -108,7 +104,6 @@ export function LoginClient() {
               <input
                 type="email"
                 className="w-full rounded-xl border border-[#E0D2B5] px-3 py-2 text-sm outline-none focus:border-[#174A8B] focus:ring-2 focus:ring-[#174A8B]/30 bg-white"
-                placeholder="admin@tudominio.com"
                 {...register("email")}
               />
               {errors.email && (
@@ -121,7 +116,6 @@ export function LoginClient() {
               <input
                 type="password"
                 className="w-full rounded-xl border border-[#E0D2B5] px-3 py-2 text-sm outline-none focus:border-[#174A8B] focus:ring-2 focus:ring-[#174A8B]/30 bg-white"
-                placeholder="••••••••"
                 {...register("password")}
               />
               {errors.password && (

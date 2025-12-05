@@ -15,6 +15,7 @@ export function DashboardClient({ adminName }: Props) {
   const { isAuthenticated, clearAuth } = useAuthStore()
   const { summary, loading, error, fetchSummary, reset } = useDashboardStore();
   const [closeSession, setCloseSession] = useState(false)
+  const [createDomi, setCreateDomi] = useState(false)
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -38,6 +39,11 @@ export function DashboardClient({ adminName }: Props) {
     clearAuth();
     reset();
     router.replace("/login");
+  }
+
+  const handleCreateDomi = () => {
+    setCreateDomi(true)
+    router.replace("/create-domi");
   }
 
   return (
@@ -91,6 +97,10 @@ export function DashboardClient({ adminName }: Props) {
                 {totalDomiciliarios}
               </p>
             )}
+            <button
+              onClick={handleCreateDomi}
+              className="bg-[#FFF9E8] rounded-full text-[10px] sm:text-xs font-medium shadow-md"
+            >{createDomi ? "Cargando..." : "Crear Domiciliario"}</button>
           </div>
 
           <div className="rounded-3xl border border-[#F5E9C8]/40 bg-[#102F59]/90 px-4 py-4 sm:px-5 sm:py-5 shadow-2xl flex flex-col justify-between">

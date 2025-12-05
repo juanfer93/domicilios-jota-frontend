@@ -10,7 +10,7 @@ const config: Config = {
     extend: {
       colors: {
         jjBlue: "#174A8B",
-        jjBlueDark: "#102F59",
+        jjBlueDark: "#030303ff",
         jjBeige: "#F5E9C8",
         jjBeigeSoft: "#FFF9E8",
       },

@@ -1,3 +1,4 @@
+import { getAuthHeaders } from "./GetAuthHeaders";
 import axios from "axios";
 
 export const api = axios.create({
@@ -35,6 +36,27 @@ export interface LoginResponse {
   };
 }
 
+export interface CreateDomiciliarioPayload {
+  nombre: string;
+  email: string;
+}
+
+export interface CreateDomiciliarioResponse {
+  id: string;
+  nombre: string;
+  email: string;
+  rol: string;
+}
+
+export interface SetPasswordDomiciliarioPayload {
+  token: string;
+  password: string;
+}
+
+export interface SetPasswordDomiciliarioResponse {
+  message: string;
+}
+
 export const getAdminStatus = async (): Promise<AdminStatus> => {
   const { data } = await api.get<AdminStatus>("/api/v1/users/admin-status");
   return data;
@@ -64,3 +86,34 @@ export const getDashboardSummary = async (): Promise<DashboardSummary> => {
   );
   return data;
 }
+
+export const createDomiciliario = async (
+  payload: CreateDomiciliarioPayload
+): Promise<CreateDomiciliarioResponse> => {
+  const { data } = await api.post(
+    "/api/v1/usuarios/domiciliarios",
+    payload,
+    {
+      headers: {
+        ...getAuthHeaders(),
+      },
+    }
+  );
+
+  const payloadData = (data as any)?.data ?? data;
+
+  return payloadData as CreateDomiciliarioResponse;
+};
+
+export const setPasswordDomiciliario = async (
+  payload: SetPasswordDomiciliarioPayload
+): Promise<SetPasswordDomiciliarioResponse> => {
+  const { data } = await api.post(
+    "/api/v1/auth/domiciliarios/set-password",
+    payload
+  );
+
+  const payloadData = (data as any)?.data ?? data;
+
+  return payloadData as SetPasswordDomiciliarioResponse;
+};
