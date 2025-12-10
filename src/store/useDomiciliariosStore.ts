@@ -2,6 +2,9 @@ import { create } from "zustand";
 import {
   createDomiciliario as createDomiciliarioRequest,
   setPasswordDomiciliario as setPasswordDomiciliarioRequest,
+  getDomiciliarios,
+  deleteDomiciliario as deleteDomiciliarioRequest,
+  DomiciliarioItem
 } from "./../lib/api";
 
 interface DomiciliariosState {
@@ -16,12 +19,24 @@ interface DomiciliariosState {
   errorPassword: string | null;
   clearPasswordMessages: () => void;
   setPasswordForDomiciliario: (payload: { token: string; password: string }) => Promise<boolean>;
+
+  list: DomiciliarioItem[];
+  loadingList: boolean;
+  errorList: string | null;
+  fetchDomiciliarios: () => Promise<void>;
+  deleteDomiciliario: (id: string) => Promise<boolean>;
 }
 
 export const useDomiciliariosStore = create<DomiciliariosState>((set) => ({
   loadingCreate: false,
   mensajeCreate: null,
   errorCreate: null,
+  loadingPassword: false,
+  mensajePassword: null,
+  errorPassword: null,
+  list: [],
+  loadingList: false,
+  errorList: null,
 
   clearCreateMessages: () => set({ mensajeCreate: null, errorCreate: null }),
 
@@ -54,10 +69,6 @@ export const useDomiciliariosStore = create<DomiciliariosState>((set) => ({
     }
   },
 
-  loadingPassword: false,
-  mensajePassword: null,
-  errorPassword: null,
-
   clearPasswordMessages: () => set({ mensajePassword: null, errorPassword: null }),
 
   setPasswordForDomiciliario: async ({ token, password }) => {
@@ -86,6 +97,47 @@ export const useDomiciliariosStore = create<DomiciliariosState>((set) => ({
       return false;
     } finally {
       set({ loadingPassword: false });
+    }
+  },
+
+  fetchDomiciliarios: async () => {
+    set({ loadingList: true, errorList: null });
+    try {
+      const data = await getDomiciliarios();
+      set({ list: data });
+    } catch (err: any) {
+      const apiMessage =
+        err?.response?.data?.message ??
+        "No se pudieron cargar los domiciliarios.";
+
+      set({
+        errorList: Array.isArray(apiMessage)
+          ? apiMessage.join(", ")
+          : apiMessage,
+      });
+    } finally {
+      set({ loadingList: false });
+    }
+  },
+
+  deleteDomiciliario: async (id: string) => {
+    try {
+      await deleteDomiciliarioRequest(id);
+      set((state) => ({
+        list: state.list.filter((d) => d.id !== id),
+      }));
+      return true;
+    } catch (err: any) {
+      const apiMessage =
+        err?.response?.data?.message ??
+        "No se pudo eliminar el domiciliario.";
+
+      set({
+        errorList: Array.isArray(apiMessage)
+          ? apiMessage.join(", ")
+          : apiMessage,
+      });
+      return false;
     }
   },
 }));

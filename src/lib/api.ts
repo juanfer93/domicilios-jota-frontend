@@ -19,6 +19,7 @@ export interface CreateAdminPayload {
 export interface DashboardSummary {
   totalPedidos: number;
   totalDomiciliarios: number;
+  totalComercios: number;
 }
 
 export interface LoginPayload {
@@ -46,6 +47,12 @@ export interface CreateDomiciliarioResponse {
   nombre: string;
   email: string;
   rol: string;
+}
+
+export interface DomiciliarioItem {
+  id: string;
+  nombre: string;
+  email: string;
 }
 
 export interface SetPasswordDomiciliarioPayload {
@@ -84,7 +91,9 @@ export const getDashboardSummary = async (): Promise<DashboardSummary> => {
   const { data } = await api.get<DashboardSummary>(
     "/api/v1/users/dashboard-summary"
   );
-  return data;
+  const payloadData = (data as any)?.data ?? data;
+
+  return payloadData as DashboardSummary;
 }
 
 export const createDomiciliario = async (
@@ -116,4 +125,24 @@ export const setPasswordDomiciliario = async (
   const payloadData = (data as any)?.data ?? data;
 
   return payloadData as SetPasswordDomiciliarioResponse;
+};
+
+export const getDomiciliarios = async (): Promise<DomiciliarioItem[]> => {
+  const { data } = await api.get("/api/v1/usuarios/domiciliarios", {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+
+  const payloadData = (data as any)?.data ?? data;
+
+  return payloadData as DomiciliarioItem[];
+};
+
+export const deleteDomiciliario = async (id: string): Promise<void> => {
+  await api.delete(`/api/v1/usuarios/domiciliarios/${id}`, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
 };
