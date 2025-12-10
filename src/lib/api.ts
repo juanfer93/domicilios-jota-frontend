@@ -55,6 +55,17 @@ export interface DomiciliarioItem {
   email: string;
 }
 
+export interface ComercioItem {
+  id: string;
+  nombre: string;
+  direccion: string;
+}
+
+export interface ComercioPayload {
+  nombre: string;
+  direccion: string;
+}
+
 export interface SetPasswordDomiciliarioPayload {
   token: string;
   password: string;
@@ -146,3 +157,27 @@ export const deleteDomiciliario = async (id: string): Promise<void> => {
     },
   });
 };
+
+export const getComercios = async () => {
+  const res = await api.get("/api/v1/comercios", {
+    headers: getAuthHeaders(), 
+  });
+
+  const payloadData = (res.data as any)?.data ?? res.data;
+  return payloadData as ComercioItem[];
+}
+
+export const createComercios = async (data: ComercioPayload) => {
+  const res = await api.post("/api/v1/comercios", data, {
+    headers: getAuthHeaders(), 
+  });
+
+  const payloadData = (res.data as any)?.data ?? res.data;
+  return payloadData as ComercioItem;
+}
+
+export const deleteComercios = async (id: string): Promise<void> => {
+  await api.delete(`/api/v1/comercios/${id}`, {
+    headers: getAuthHeaders(), 
+  })
+}

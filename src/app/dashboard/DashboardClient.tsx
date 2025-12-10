@@ -5,16 +5,21 @@ import { useRouter } from "next/navigation";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useAuthStore } from "@/store/UseAuthStore";
 import { useDomiciliariosStore } from "@/store/useDomiciliariosStore";
-import type { DomiciliarioItem } from "@/lib/api";
+import { useComerciosStore } from "@/store/useComerciosStore";
+import type { DomiciliarioItem, ComercioItem } from "@/lib/api";
+import { DomiciliariosModal } from "./DomiciliariosModal";
+import { DeleteDomiciliarioModal } from "./DeleteDomiciliarioModal";
+import { ComerciosModal } from "./ComerciosModal";
+import { DeleteComercioModal } from "./DeleteComercioModal";
 
 type Props = {
   adminName: string;
 };
 
 export function DashboardClient({ adminName }: Props) {
-  const router = useRouter()
+  const router = useRouter();
 
-  const { isAuthenticated, clearAuth } = useAuthStore()
+  const { isAuthenticated, clearAuth } = useAuthStore();
   const {
     list: domiciliarios,
     loadingList,
@@ -22,27 +27,75 @@ export function DashboardClient({ adminName }: Props) {
     fetchDomiciliarios,
     deleteDomiciliario,
   } = useDomiciliariosStore();
+  const {
+    list: comercios,
+    loadingList: loadingComercios,
+    errorList: errorComercios,
+    fetchComercios,
+    deleteComercio,
+  } = useComerciosStore();
   const { summary, loading, error, fetchSummary, reset } = useDashboardStore();
-  const [closeSession, setCloseSession] = useState(false)
-  const [createDomi, setCreateDomi] = useState(false)
+  const [closeSession, setCloseSession] = useState(false);
+  const [createDomi, setCreateDomi] = useState(false);
   const [showDomisModal, setShowDomisModal] = useState(false);
+  const [showComerciosModal, setShowComerciosModal] = useState(false);
   const [domiToDelete, setDomiToDelete] = useState<DomiciliarioItem | null>(null);
+  const [comercioToDelete, setComercioToDelete] = useState<ComercioItem | null>(null);
+
 
   const totalPedidos = summary?.totalPedidos ?? 0;
   const totalDomiciliarios = summary?.totalDomiciliarios ?? 0;
-  const totalComercios = summary?.totalComercios ?? 0
+  const totalComercios = summary?.totalComercios ?? 0;
+
 
   const handleLogout = () => {
-    setCloseSession(true)
+    setCloseSession(true);
     clearAuth();
     reset();
     router.replace("/login");
-  }
+  };
 
   const handleCreateDomi = () => {
-    setCreateDomi(true)
+    setCreateDomi(true);
     router.replace("/create-domi");
-  }
+  };
+
+  const handleCreateCommerce = () => {
+    router.replace("/create-commerce");
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!domiToDelete) return;
+    const ok = await deleteDomiciliario(domiToDelete.id);
+    if (ok) {
+      setDomiToDelete(null);
+      fetchSummary();
+      fetchDomiciliarios();
+    }
+  };
+
+  const handleConfirmDeleteComercio = async () => {
+    if (!comercioToDelete) return;
+    const ok = await deleteComercio(comercioToDelete.id);
+    if (ok) {
+      setComercioToDelete(null);
+      fetchSummary();
+      fetchComercios();
+    }
+  };
+
+  const handleOpenDomisModal = () => setShowDomisModal(true);
+
+  const handleCloseDomisModal = () => setShowDomisModal(false);
+
+  const handleOpenComerciosModal = () => setShowComerciosModal(true);
+
+  const handleCloseComerciosModal = () => setShowComerciosModal(false);
+
+  const handleCancelDelete = () => setDomiToDelete(null);
+
+  const handleCancelDeleteComercio = () => setComercioToDelete(null);
+
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -50,20 +103,23 @@ export function DashboardClient({ adminName }: Props) {
       reset();
       router.replace("/login");
     }
-  }, [isAuthenticated, clearAuth, router]);
+  }, [isAuthenticated, clearAuth, router, reset]);
 
   useEffect(() => {
-    if (!summary && isAuthenticated()) {
+    if (isAuthenticated()) {
       fetchSummary();
     }
-  }, [summary, fetchSummary, isAuthenticated]);
+  }, [isAuthenticated, fetchSummary]);
 
   useEffect(() => {
     if (!showDomisModal) return;
-
     fetchDomiciliarios();
   }, [showDomisModal, fetchDomiciliarios]);
 
+  useEffect(() => {
+    if (!showComerciosModal) return;
+    fetchComercios();
+  }, [showComerciosModal, fetchComercios]);
 
 
   return (
@@ -102,9 +158,10 @@ export function DashboardClient({ adminName }: Props) {
           </div>
         </header>
 
-
         <section className="flex flex-col gap-3 sm:gap-4 items-start">
-          <div
+          <button
+            type="button"
+            onClick={handleOpenComerciosModal}
             className="
               w-full md:w-1/2
               rounded-3xl 
@@ -114,6 +171,7 @@ export function DashboardClient({ adminName }: Props) {
               sm:px-5 sm:py-5 
               shadow-2xl 
               flex flex-col justify-between
+              text-left
             "
           >
             <span className="text-[10px] sm:text-xs uppercase tracking-[0.18em] text-[#F5E9C8]/70">
@@ -121,17 +179,19 @@ export function DashboardClient({ adminName }: Props) {
             </span>
 
             {loading ? (
-              <p className="mt-2 text-lg sm:text-2xl font-bold opacity-70">...</p>
+              <p className="mt-2 text-lg sm:text-2xl font-bold opacity-70">
+                ...
+              </p>
             ) : (
               <p className="mt-2 text-2xl sm:text-3xl font-bold text-[#F5E9C8]">
                 {totalComercios}
               </p>
             )}
-          </div>
+          </button>
 
           <button
             type="button"
-            onClick={() => setShowDomisModal(true)}
+            onClick={handleOpenDomisModal}
             className="
               w-full md:w-1/2
               rounded-3xl 
@@ -158,25 +218,6 @@ export function DashboardClient({ adminName }: Props) {
             )}
           </button>
 
-
-          <button
-            onClick={handleCreateDomi}
-            className="
-              w-full md:w-1/2
-              h-10 sm:h-11
-              bg-[#FFF9E8] 
-              rounded-3xl 
-              text-[10px] sm:text-xs 
-              font-medium 
-              shadow-md 
-              flex items-center justify-center 
-              hover:bg-[#f3ebd4] 
-              transition-colors
-            "
-          >
-            {createDomi ? "Cargando..." : "Crear Domiciliario"}
-          </button>
-
           <div
             className="
               w-full md:w-1/2
@@ -194,7 +235,9 @@ export function DashboardClient({ adminName }: Props) {
             </span>
 
             {loading ? (
-              <p className="mt-2 text-lg sm:text-2xl font-bold opacity-70">...</p>
+              <p className="mt-2 text-lg sm:text-2xl font-bold opacity-70">
+                ...
+              </p>
             ) : (
               <p className="mt-2 text-2xl sm:text-3xl font-bold text-[#F5E9C8]">
                 {totalPedidos}
@@ -215,107 +258,39 @@ export function DashboardClient({ adminName }: Props) {
         </p>
       </div>
 
-      {showDomisModal && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
-          <div className="bg-[#FFF9E8] rounded-3xl shadow-2xl w-full max-w-md mx-4 p-4 sm:p-6 relative">
-            <button
-              type="button"
-              onClick={() => setShowDomisModal(false)}
-              className="absolute right-3 top-3 text-xs text-[#102F59]/70 hover:text-[#102F59]"
-            >
-              ✕
-            </button>
+      <DomiciliariosModal
+        isOpen={showDomisModal}
+        onClose={handleCloseDomisModal}
+        domiciliarios={domiciliarios}
+        loadingList={loadingList}
+        errorList={errorList}
+        onSelectDomiToDelete={setDomiToDelete}
+        createDomi={createDomi}
+        handleCreateDomi={handleCreateDomi}
+      />
 
-            <h2 className="text-lg sm:text-xl font-semibold text-[#102F59]">
-              Domiciliarios
-            </h2>
-            <p className="mt-1 text-xs sm:text-sm text-[#174A8B]/80">
-              Lista de domiciliarios registrados.
-            </p>
+      <ComerciosModal
+        isOpen={showComerciosModal}
+        onClose={handleCloseComerciosModal}
+        comercios={comercios}
+        loadingList={loadingComercios}
+        errorList={errorComercios}
+        onCreateCommerce={handleCreateCommerce}
+        onSelectComercioToDelete={setComercioToDelete}
 
-            <div className="mt-4 space-y-3 max-h-72 overflow-y-auto">
-              {loadingList && (
-                <p className="text-xs text-[#174A8B]/80">Cargando...</p>
-              )}
+      />
 
-              {!loadingList && domiciliarios.length === 0 && (
-                <p className="text-xs text-[#174A8B]/80">
-                  No hay domiciliarios registrados.
-                </p>
-              )}
+      <DeleteDomiciliarioModal
+        domiToDelete={domiToDelete}
+        onCancel={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+      />
 
-              {!loadingList && domiciliarios.length > 0 &&
-                domiciliarios.map((domi) => (
-                  <div
-                    key={domi.id}
-                    className="flex items-center justify-between bg-[#102F59] text-[#F5E9C8] rounded-2xl px-3 py-2"
-                  >
-                    <div>
-                      <p className="text-sm font-semibold">{domi.nombre}</p>
-                      <p className="text-xs text-[#F5E9C8]/80">{domi.email}</p>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => setDomiToDelete(domi)}
-                      className="text-[11px] sm:text-xs px-2 py-1 rounded-full bg-[#F5E9C8] text-[#102F59] hover:bg-[#f3ebd4] transition-colors"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                ))
-              }
-            </div>
-
-            {errorList && (
-              <p className="mt-3 text-xs text-red-600">
-                {errorList}
-              </p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {domiToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-[#FFF9E8] rounded-3xl shadow-2xl w-full max-w-sm mx-4 p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg font-semibold text-[#102F59]">
-              ¿Eliminar domiciliario?
-            </h3>
-            <p className="mt-2 text-xs sm:text-sm text-[#174A8B]/80">
-              Se eliminará{" "}
-              <span className="font-semibold">{domiToDelete.nombre}</span>{" "}
-              ({domiToDelete.email}). Esta acción no se puede deshacer.
-            </p>
-
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setDomiToDelete(null)}
-                className="px-3 py-1.5 text-[11px] sm:text-xs rounded-full border border-[#102F59]/40 text-[#102F59]"
-              >
-                Cancelar
-              </button>
-
-              <button
-                type="button"
-                onClick={async () => {
-                  const ok = await deleteDomiciliario(domiToDelete.id);
-                  if (ok) {
-                    setDomiToDelete(null);
-                    fetchSummary();
-                  }
-                }}
-                className="px-3 py-1.5 text-[11px] sm:text-xs rounded-full bg-red-600 text-white hover:bg-red-700"
-              >
-                Sí, eliminar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
+      <DeleteComercioModal
+        comercioToDelete={comercioToDelete}
+        onCancel={handleCancelDeleteComercio}
+        onConfirm={handleConfirmDeleteComercio}
+      />
     </div>
   );
 }
-
