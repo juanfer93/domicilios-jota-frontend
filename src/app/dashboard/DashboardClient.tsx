@@ -64,6 +64,10 @@ export function DashboardClient({ adminName }: Props) {
     router.replace("/create-commerce");
   };
 
+  const handleOpenDelivery = () => {
+    router.replace("/delivery");
+  };
+
   const handleConfirmDelete = async () => {
     if (!domiToDelete) return;
     const ok = await deleteDomiciliario(domiToDelete.id);
@@ -218,7 +222,9 @@ export function DashboardClient({ adminName }: Props) {
             )}
           </button>
 
-          <div
+          <button
+            type="button"
+            onClick={handleOpenDelivery}
             className="
               w-full md:w-1/2
               rounded-3xl 
@@ -228,8 +234,9 @@ export function DashboardClient({ adminName }: Props) {
               sm:px-5 sm:py-5 
               shadow-2xl 
               flex flex-col justify-between
+              text-left
             "
-          >
+>
             <span className="text-[10px] sm:text-xs uppercase tracking-[0.18em] text-[#F5E9C8]/70">
               Pedidos
             </span>
@@ -243,7 +250,7 @@ export function DashboardClient({ adminName }: Props) {
                 {totalPedidos}
               </p>
             )}
-          </div>
+          </button>
         </section>
 
         {error && (

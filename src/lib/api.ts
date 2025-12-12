@@ -5,6 +5,8 @@ export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000",
 });
 
+export type PedidoEstado = "EN_PROCESO" | "HECHO" | "CANCELADO";
+
 export interface AdminStatus {
   hasAdmin: boolean;
   adminName?: string | null
@@ -73,6 +75,41 @@ export interface SetPasswordDomiciliarioPayload {
 
 export interface SetPasswordDomiciliarioResponse {
   message: string;
+}
+
+export interface PedidoItem {
+  id: string;
+  usuario_id: string;
+  comercio_id: string;
+  valor_final: number;
+  valor_domicilio?: number | null;
+  estado: PedidoEstado;
+  created_at: string;
+  assigned_by?: string | null;
+  assigned_at?: string | null;
+
+  usuario?: {
+    id: string;
+    nombre: string;
+    email: string;
+  };
+
+  comercio?: {
+    id: string;
+    nombre: string;
+    direccion: string;
+  };
+}
+
+export interface CreatePedidoPayload {
+  usuarioId: string;  
+  comercioId: string;
+  valorFinal: number;
+  valorDomicilio?: number;
+}
+
+export interface UpdatePedidoEstadoPayload {
+  estado: PedidoEstado;
 }
 
 export const getAdminStatus = async (): Promise<AdminStatus> => {
@@ -181,3 +218,51 @@ export const deleteComercios = async (id: string): Promise<void> => {
     headers: getAuthHeaders(), 
   })
 }
+
+export const getPedidosHoy = async (): Promise<PedidoItem[]> => {
+  const res = await api.get("/api/v1/pedidos/admin/today", {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+
+  const payloadData = (res.data as any)?.data ?? res.data;
+  return payloadData as PedidoItem[];
+};
+
+export const getPedidosHistorial = async (date: string): Promise<PedidoItem[]> => {
+  const res = await api.get("/api/v1/pedidos/admin/history", {
+    params: { date },
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+
+  const payloadData = (res.data as any)?.data ?? res.data;
+  return payloadData as PedidoItem[];
+};
+
+export const createPedido = async (payload: CreatePedidoPayload): Promise<PedidoItem> => {
+  const res = await api.post("/api/v1/pedidos/admin", payload, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+
+  const payloadData = (res.data as any)?.data ?? res.data;
+  return payloadData as PedidoItem;
+};
+
+export const updatePedidoEstado = async (
+  pedidoId: string,
+  payload: UpdatePedidoEstadoPayload
+): Promise<PedidoItem> => {
+  const res = await api.patch(`/api/v1/pedidos/admin/${pedidoId}/estado`, payload, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+
+  const payloadData = (res.data as any)?.data ?? res.data;
+  return payloadData as PedidoItem;
+};
