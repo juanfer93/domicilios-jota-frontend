@@ -51,18 +51,24 @@ export function LoginClient() {
         password: values.password,
       });
 
+      const rol = (data.usuario.rol || "").toLowerCase();
+
       setAuth(data.accessToken, {
         id: data.usuario.id,
         nombre: data.usuario.nombre,
         email: data.usuario.email,
-        rol: data.usuario.rol,
+        rol, 
       });
 
-      router.replace("/dashboard");
+      if (rol === "domiciliario") {
+        router.push("/profile-delivery");
+      } else {
+        router.push("/dashboard");
+      }
+
     } catch (err: any) {
       console.error("Error en login:", err);
       clearAuth();
-
       const message =
         err?.response?.data?.message ??
         "No se pudo iniciar sesión. Verifica tus credenciales.";
@@ -71,6 +77,7 @@ export function LoginClient() {
       setSubmitting(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-[#FFF9E8] text-[#102F59] flex flex-col">
