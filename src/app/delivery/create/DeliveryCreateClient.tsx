@@ -84,7 +84,6 @@ export function DeliveryCreateClient({ adminName }: { adminName: string }) {
           </div>
         ) : (
           <div className="mt-5 grid gap-4 md:grid-cols-2">
-            {/* Domiciliarios */}
             <div className="rounded-2xl border border-black/10 bg-white p-4">
               <h2 className="mb-3 text-base font-extrabold text-[#030303ff]">Domiciliarios</h2>
 
@@ -120,7 +119,6 @@ export function DeliveryCreateClient({ adminName }: { adminName: string }) {
               </div>
             </div>
 
-            {/* Comercios */}
             <div className="rounded-2xl border border-black/10 bg-white p-4">
               <h2 className="mb-3 text-base font-extrabold text-[#030303ff]">Comercios</h2>
 

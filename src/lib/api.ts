@@ -87,6 +87,7 @@ export interface PedidoItem {
   created_at: string;
   assigned_by?: string | null;
   assigned_at?: string | null;
+  direccionDestino: string;
 
   usuario?: {
     id: string;
@@ -101,11 +102,24 @@ export interface PedidoItem {
   };
 }
 
+export interface CurrentDeliveryItem {
+  id: string;
+  valorFinal: number;
+  valorDomicilio: number;
+  direccionDestino: string;
+  comercio?: {
+    id: string;
+    nombre: string;
+    direccion: string;
+  };
+}
+
 export interface CreatePedidoPayload {
   usuarioId: string;  
   comercioId: string;
   valorFinal: number;
   valorDomicilio?: number;
+  direccionDestino: string;
 }
 
 export interface UpdatePedidoEstadoPayload {
@@ -242,7 +256,9 @@ export const getPedidosHistorial = async (date: string): Promise<PedidoItem[]> =
   return payloadData as PedidoItem[];
 };
 
-export const createPedido = async (payload: CreatePedidoPayload): Promise<PedidoItem> => {
+export const createPedido = async (
+  payload: CreatePedidoPayload
+): Promise<PedidoItem> => {
   const res = await api.post("/api/v1/pedidos/admin", payload, {
     headers: {
       ...getAuthHeaders(),
@@ -265,4 +281,20 @@ export const updatePedidoEstado = async (
 
   const payloadData = (res.data as any)?.data ?? res.data;
   return payloadData as PedidoItem;
+}; 
+
+export const getCurrentDelivery = async (): Promise<CurrentDeliveryItem | null> => {
+  const res = await api.get("/api/v1/pedidos/admin/domiciliarios/current", {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+
+  const payloadData = (res.data as any)?.data ?? res.data;
+
+  if (!payloadData) return null;
+
+  return payloadData as CurrentDeliveryItem;
 };
+
+

@@ -14,7 +14,7 @@ export default function ProfileDeliveryClient() {
   const isDomiciliario =
     !!user && user.rol && user.rol.toLowerCase() === 'domiciliario';
 
-  const saldoNumero = (user as any).saldo ?? 0;
+  const saldoNumero = (user as any)?.saldo ?? 0;
   const saldoFormateado = new Intl.NumberFormat('es-CO', {
     style: 'currency',
     currency: 'COP',
@@ -67,11 +67,11 @@ export default function ProfileDeliveryClient() {
             <div className="w-10 h-10 rounded-full bg-[#FFF9E8] flex items-center justify-center mr-4">
               <span className="text-[#174A8B] text-xs font-extrabold">NEW</span>
             </div>
-            <span className="text-base">Nuevo Servicio</span>
-          </button>
+            <span className="text-base">Historial servicios</span>
+          </button> 
 
           <button
-            onClick={() => router.push('/delivery')}
+            onClick={() => router.push('/profile-delivery/current-delivery')}
             className="w-full flex items-center py-3 px-4 rounded-lg bg-[#174A8B] text-[#FFF9E8] shadow-sm hover:brightness-110 transition"
           >
             <div className="w-10 h-10 rounded-full bg-[#F5E9C8] flex items-center justify-center mr-4">
@@ -130,7 +130,7 @@ export default function ProfileDeliveryClient() {
           <span className="text-sm">{user.nombre}</span>
         </div>
         <span className="text-sm opacity-90">
-          {(user as any).codigo ?? user.id?.slice(0, 4)}
+          {(user as any)?.codigo ?? user?.id?.slice(0, 4)}
         </span>
       </footer>
     </div>

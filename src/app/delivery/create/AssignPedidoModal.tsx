@@ -21,6 +21,8 @@ export function AssignPedidoModal() {
 
     statusCreate,
     assignPedido,
+    direccionDestino,
+    setDireccionDestino,
   } = useDeliveryStore();
 
   const selectedDomiciliario = useMemo(
@@ -86,6 +88,19 @@ export function AssignPedidoModal() {
                 value={valorDomicilio}
                 onChange={(e) => setValorDomicilio(e.target.value)}
                 placeholder="Ej: 5000"
+                className="rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-[#030303ff] focus:outline-none focus:ring-2 focus:ring-[#174A8B]/30"
+              />
+            </label>
+
+            <label className="grid gap-2">
+              <span className="text-sm font-extrabold text-[#030303ff]">
+                Dirección destino
+              </span>
+              <input
+                type="text"
+                value={direccionDestino}
+                onChange={(e) => setDireccionDestino(e.target.value)}
+                placeholder="Ej: Cra 55 #75-119, apto 2B"
                 className="rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-[#030303ff] focus:outline-none focus:ring-2 focus:ring-[#174A8B]/30"
               />
             </label>
