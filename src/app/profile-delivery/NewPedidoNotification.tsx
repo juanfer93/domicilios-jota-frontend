@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { listenNotifications } from "@/lib/notifications";
+import {
+  ensureBrowserNotificationPermission,
+  listenNotifications,
+  notifyNewPedidoBrowser,
+} from "@/lib/notifications";
 import { useAuthStore } from "@/store/UseAuthStore";
 
 type NewPedidoState = {
@@ -35,6 +39,16 @@ export function NewPedidoNotification() {
 
     return unsubscribe;
   }, [isDomiciliario, user]);
+
+  useEffect(() => {
+    if (!pedido) return;
+    notifyNewPedidoBrowser(pedido.pedidoId);
+  }, [pedido]);
+
+  useEffect(() => {
+    if (!isDomiciliario) return;
+    ensureBrowserNotificationPermission();
+  }, [isDomiciliario]);
 
   if (!pedido) return null;
 
