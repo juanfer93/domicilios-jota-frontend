@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/UseAuthStore';
+import { NewPedidoNotification } from './NewPedidoNotification';
 
 export default function ProfileDeliveryClient() {
   const router = useRouter();
@@ -133,6 +134,8 @@ export default function ProfileDeliveryClient() {
           {(user as any)?.codigo ?? user?.id?.slice(0, 4)}
         </span>
       </footer>
+
+      <NewPedidoNotification />
     </div>
   );
 }
