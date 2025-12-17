@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/UseAuthStore";
 import { getCurrentDelivery, type CurrentDeliveryItem } from "@/lib/api";
+import { NewPedidoNotification } from "../NewPedidoNotification";
 
 export default function CurrentDeliveryClient() {
   const router = useRouter();
@@ -161,6 +162,8 @@ export default function CurrentDeliveryClient() {
           </div>
         </div>
       </main>
+
+      <NewPedidoNotification />
     </div>
   );
 }
