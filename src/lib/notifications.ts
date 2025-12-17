@@ -74,7 +74,6 @@ export async function notifyNewPedidoBrowser(pedidoId: string) {
   const notification = new Notification(NOTIFICATION_TITLE, {
     body: "Toca para ver el pedido en curso.",
     tag: `pedido-${pedidoId}`,
-    renotify: true,
     icon: "/favicon.ico",
   });
 
