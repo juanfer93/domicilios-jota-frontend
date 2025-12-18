@@ -8,6 +8,8 @@ export type AuthUser = {
   nombre: string;
   email: string;
   rol: string;
+  saldo?: number;
+  codigo?: string;
 };
 
 interface AuthState {

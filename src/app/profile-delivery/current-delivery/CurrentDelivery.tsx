@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/UseAuthStore";
 import { getCurrentDelivery, type CurrentDeliveryItem } from "@/lib/api";
+import { getApiErrorMessage } from "@/lib/apiUtils";
 import { NewPedidoNotification } from "../NewPedidoNotification";
 
 export default function CurrentDeliveryClient() {
@@ -37,8 +38,13 @@ export default function CurrentDeliveryClient() {
         setError(null);
         const data = await getCurrentDelivery();
         setPedido(data);
-      } catch (err: any) {
-        setError("No se pudo cargar el servicio en curso.");
+      } catch (err: unknown) {
+        setError(
+          getApiErrorMessage(
+            err,
+            "No se pudo cargar el servicio en curso."
+          )
+        );
       } finally {
         setLoading(false);
       }

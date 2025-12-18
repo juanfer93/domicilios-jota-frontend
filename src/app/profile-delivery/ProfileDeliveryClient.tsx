@@ -15,7 +15,7 @@ export default function ProfileDeliveryClient() {
   const isDomiciliario =
     !!user && user.rol && user.rol.toLowerCase() === 'domiciliario';
 
-  const saldoNumero = (user as any)?.saldo ?? 0;
+  const saldoNumero = user?.saldo ?? 0;
   const saldoFormateado = new Intl.NumberFormat('es-CO', {
     style: 'currency',
     currency: 'COP',
@@ -131,7 +131,7 @@ export default function ProfileDeliveryClient() {
           <span className="text-sm">{user.nombre}</span>
         </div>
         <span className="text-sm opacity-90">
-          {(user as any)?.codigo ?? user?.id?.slice(0, 4)}
+          {user?.codigo ?? user?.id?.slice(0, 4)}
         </span>
       </footer>
 

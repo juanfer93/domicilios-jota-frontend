@@ -28,7 +28,7 @@ export function DeliveryCreateClient({ adminName }: { adminName: string }) {
 
   useEffect(() => {
     loadRefs();
-  }, [token]);
+  }, [loadRefs, token]);
 
   const lockedDomiciliarios = selectedDomiciliarioId !== null;
   const lockedComercios = selectedComercioId !== null;

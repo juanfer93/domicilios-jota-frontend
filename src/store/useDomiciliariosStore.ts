@@ -6,6 +6,7 @@ import {
   deleteDomiciliario as deleteDomiciliarioRequest,
   DomiciliarioItem
 } from "./../lib/api";
+import { getApiErrorMessage } from "@/lib/apiUtils";
 
 interface DomiciliariosState {
   loadingCreate: boolean;
@@ -52,15 +53,14 @@ export const useDomiciliariosStore = create<DomiciliariosState>((set) => ({
       });
 
       return true;
-    } catch (err: any) {
-      const apiMessage =
-        err?.response?.data?.message ??
-        "Error al crear el domiciliario. Intenta de nuevo.";
+    } catch (err: unknown) {
+      const apiMessage = getApiErrorMessage(
+        err,
+        "Error al crear el domiciliario. Intenta de nuevo."
+      );
 
       set({
-        errorCreate: Array.isArray(apiMessage)
-          ? apiMessage.join(", ")
-          : apiMessage,
+        errorCreate: apiMessage,
       });
 
       return false;
@@ -83,15 +83,14 @@ export const useDomiciliariosStore = create<DomiciliariosState>((set) => ({
       });
 
       return true;
-    } catch (err: any) {
-      const apiMessage =
-        err?.response?.data?.message ??
-        "No se pudo crear la contraseña. El enlace puede haber expirado.";
+    } catch (err: unknown) {
+      const apiMessage = getApiErrorMessage(
+        err,
+        "No se pudo crear la contraseña. El enlace puede haber expirado."
+      );
 
       set({
-        errorPassword: Array.isArray(apiMessage)
-          ? apiMessage.join(", ")
-          : apiMessage,
+        errorPassword: apiMessage,
       });
 
       return false;
@@ -105,15 +104,14 @@ export const useDomiciliariosStore = create<DomiciliariosState>((set) => ({
     try {
       const data = await getDomiciliarios();
       set({ list: data });
-    } catch (err: any) {
-      const apiMessage =
-        err?.response?.data?.message ??
-        "No se pudieron cargar los domiciliarios.";
+    } catch (err: unknown) {
+      const apiMessage = getApiErrorMessage(
+        err,
+        "No se pudieron cargar los domiciliarios."
+      );
 
       set({
-        errorList: Array.isArray(apiMessage)
-          ? apiMessage.join(", ")
-          : apiMessage,
+        errorList: apiMessage,
       });
     } finally {
       set({ loadingList: false });
@@ -127,15 +125,14 @@ export const useDomiciliariosStore = create<DomiciliariosState>((set) => ({
         list: state.list.filter((d) => d.id !== id),
       }));
       return true;
-    } catch (err: any) {
-      const apiMessage =
-        err?.response?.data?.message ??
-        "No se pudo eliminar el domiciliario.";
+    } catch (err: unknown) {
+      const apiMessage = getApiErrorMessage(
+        err,
+        "No se pudo eliminar el domiciliario."
+      );
 
       set({
-        errorList: Array.isArray(apiMessage)
-          ? apiMessage.join(", ")
-          : apiMessage,
+        errorList: apiMessage,
       });
       return false;
     }

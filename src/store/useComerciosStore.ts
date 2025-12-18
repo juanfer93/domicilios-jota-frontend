@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { getComercios, deleteComercios, type ComercioItem } from "@/lib/api";
+import { getApiErrorMessage } from "@/lib/apiUtils";
 
 type ComerciosState = {
   list: ComercioItem[];
@@ -21,13 +22,14 @@ export const useComerciosStore = create<ComerciosState>((set) => ({
       set({ loadingList: true, errorList: null });
       const comercios = await getComercios();
       set({ list: comercios, loadingList: false });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       set({
         loadingList: false,
-        errorList:
-          error?.response?.data?.message ??
-          "Ocurrió un error al cargar los comercios.",
+        errorList: getApiErrorMessage(
+          error,
+          "Ocurrió un error al cargar los comercios."
+        ),
       });
     }
   },
@@ -39,7 +41,7 @@ export const useComerciosStore = create<ComerciosState>((set) => ({
         list: state.list.filter((c) => c.id !== id),
       }));
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       return false;
     }
