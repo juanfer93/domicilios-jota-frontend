@@ -12,6 +12,7 @@ import {
   type ComercioItem,
 } from "@/lib/api";
 import { sendNewPedidoNotification } from "@/lib/notifications";
+import { getApiErrorMessage } from "@/lib/apiUtils";
 
 type DeliveryTab = "today" | "history" | "create";
 type Status = "idle" | "loading" | "success" | "error";
@@ -126,10 +127,10 @@ export const useDeliveryStore = create<DeliveryState>((set, get) => ({
     try {
       const data = await getPedidosHoy();
       set({ pedidosHoy: data, statusToday: "success" as Status });
-    } catch (e: any) {
+    } catch (e: unknown) {
       set({
         statusToday: "error" as Status,
-        error: e?.message ?? "Error cargando pedidos de hoy",
+        error: getApiErrorMessage(e, "Error cargando pedidos de hoy"),
       });
     }
   },
@@ -144,10 +145,10 @@ export const useDeliveryStore = create<DeliveryState>((set, get) => ({
         statusHistory: "success" as Status,
         historyDate: d,
       });
-    } catch (e: any) {
+    } catch (e: unknown) {
       set({
         statusHistory: "error" as Status,
-        error: e?.message ?? "Error cargando historial",
+        error: getApiErrorMessage(e, "Error cargando historial"),
       });
     }
   },
@@ -164,10 +165,13 @@ export const useDeliveryStore = create<DeliveryState>((set, get) => ({
         comercios: coms,
         statusRefs: "success" as Status,
       });
-    } catch (e: any) {
+    } catch (e: unknown) {
       set({
         statusRefs: "error" as Status,
-        error: e?.message ?? "Error cargando domiciliarios/comercios",
+        error: getApiErrorMessage(
+          e,
+          "Error cargando domiciliarios/comercios"
+        ),
       });
     }
   },
@@ -223,10 +227,10 @@ export const useDeliveryStore = create<DeliveryState>((set, get) => ({
       await get().loadPedidosHoy();
       get().resetCreate();
       return pedido;
-    } catch (e: any) {
+    } catch (e: unknown) {
       set({
         statusCreate: "error" as Status,
-        error: e?.message ?? "Error asignando pedido",
+        error: getApiErrorMessage(e, "Error asignando pedido"),
       });
       return null;
     }
@@ -243,8 +247,8 @@ export const useDeliveryStore = create<DeliveryState>((set, get) => ({
       if (tab === "history") {
         await get().loadPedidosHistorial(historyDate);
       }
-    } catch (e: any) {
-      set({ error: e?.message ?? "Error cambiando estado" });
+    } catch (e: unknown) {
+      set({ error: getApiErrorMessage(e, "Error cambiando estado") });
     }
   },
 }));

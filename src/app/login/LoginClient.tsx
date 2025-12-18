@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { login } from "@/lib/api";
+import { getApiErrorMessage } from "@/lib/apiUtils";
 import { useAuthStore } from "@/store/UseAuthStore";
 import Image from "next/image";
 import favicon from "./../../../public/favicon.ico";
@@ -66,13 +67,14 @@ export function LoginClient() {
         router.push("/dashboard");
       }
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error en login:", err);
       clearAuth();
-      const message =
-        err?.response?.data?.message ??
-        "No se pudo iniciar sesión. Verifica tus credenciales.";
-      setServerError(Array.isArray(message) ? message[0] : String(message));
+      const message = getApiErrorMessage(
+        err,
+        "No se pudo iniciar sesión. Verifica tus credenciales."
+      );
+      setServerError(message);
     } finally {
       setSubmitting(false);
     }

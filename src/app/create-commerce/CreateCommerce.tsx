@@ -7,6 +7,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuthStore } from "@/store/UseAuthStore";
 import { createComercios, type ComercioPayload } from "@/lib/api";
+import { getApiErrorMessage } from "@/lib/apiUtils";
 
 const createCommerceSchema = z.object({
   nombre: z.string().min(1, "El nombre es obligatorio"),
@@ -43,11 +44,13 @@ export default function CreateCommerce() {
       await createComercios(values); 
 
       router.replace("/dashboard");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       setServerError(
-        error?.response?.data?.message ??
+        getApiErrorMessage(
+          error,
           "Ocurrió un error al crear el comercio."
+        )
       );
     } finally {
       setSubmitting(false);

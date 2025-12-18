@@ -1,5 +1,6 @@
 import { getAuthHeaders } from "./GetAuthHeaders";
 import axios from "axios";
+import { extractPayload } from "./apiUtils";
 
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000",
@@ -144,18 +145,18 @@ export const createAdmin = async (payload: CreateAdminPayload) => {
 export const login = async (payload: LoginPayload) => {
   const { data } = await api.post("/api/v1/auth/login", payload);
 
-  const payloadData = (data as any)?.data ?? data;
+  const payloadData = extractPayload<LoginResponse>(data);
 
-  return payloadData as LoginResponse
+  return payloadData;
 }
 
 export const getDashboardSummary = async (): Promise<DashboardSummary> => {
   const { data } = await api.get<DashboardSummary>(
     "/api/v1/users/dashboard-summary"
   );
-  const payloadData = (data as any)?.data ?? data;
+  const payloadData = extractPayload<DashboardSummary>(data);
 
-  return payloadData as DashboardSummary;
+  return payloadData;
 }
 
 export const createDomiciliario = async (
@@ -171,9 +172,9 @@ export const createDomiciliario = async (
     }
   );
 
-  const payloadData = (data as any)?.data ?? data;
+  const payloadData = extractPayload<CreateDomiciliarioResponse>(data);
 
-  return payloadData as CreateDomiciliarioResponse;
+  return payloadData;
 };
 
 export const setPasswordDomiciliario = async (
@@ -184,9 +185,9 @@ export const setPasswordDomiciliario = async (
     payload
   );
 
-  const payloadData = (data as any)?.data ?? data;
+  const payloadData = extractPayload<SetPasswordDomiciliarioResponse>(data);
 
-  return payloadData as SetPasswordDomiciliarioResponse;
+  return payloadData;
 };
 
 export const getDomiciliarios = async (): Promise<DomiciliarioItem[]> => {
@@ -196,9 +197,9 @@ export const getDomiciliarios = async (): Promise<DomiciliarioItem[]> => {
     },
   });
 
-  const payloadData = (data as any)?.data ?? data;
+  const payloadData = extractPayload<DomiciliarioItem[]>(data);
 
-  return payloadData as DomiciliarioItem[];
+  return payloadData;
 };
 
 export const deleteDomiciliario = async (id: string): Promise<void> => {
@@ -211,25 +212,25 @@ export const deleteDomiciliario = async (id: string): Promise<void> => {
 
 export const getComercios = async () => {
   const res = await api.get("/api/v1/comercios", {
-    headers: getAuthHeaders(), 
+    headers: getAuthHeaders(),
   });
 
-  const payloadData = (res.data as any)?.data ?? res.data;
-  return payloadData as ComercioItem[];
+  const payloadData = extractPayload<ComercioItem[]>(res.data);
+  return payloadData;
 }
 
 export const createComercios = async (data: ComercioPayload) => {
   const res = await api.post("/api/v1/comercios", data, {
-    headers: getAuthHeaders(), 
+    headers: getAuthHeaders(),
   });
 
-  const payloadData = (res.data as any)?.data ?? res.data;
-  return payloadData as ComercioItem;
+  const payloadData = extractPayload<ComercioItem>(res.data);
+  return payloadData;
 }
 
 export const deleteComercios = async (id: string): Promise<void> => {
   await api.delete(`/api/v1/comercios/${id}`, {
-    headers: getAuthHeaders(), 
+    headers: getAuthHeaders(),
   })
 }
 
@@ -240,8 +241,8 @@ export const getPedidosHoy = async (): Promise<PedidoItem[]> => {
     },
   });
 
-  const payloadData = (res.data as any)?.data ?? res.data;
-  return payloadData as PedidoItem[];
+  const payloadData = extractPayload<PedidoItem[]>(res.data);
+  return payloadData;
 };
 
 export const getPedidosHistorial = async (date: string): Promise<PedidoItem[]> => {
@@ -252,8 +253,8 @@ export const getPedidosHistorial = async (date: string): Promise<PedidoItem[]> =
     },
   });
 
-  const payloadData = (res.data as any)?.data ?? res.data;
-  return payloadData as PedidoItem[];
+  const payloadData = extractPayload<PedidoItem[]>(res.data);
+  return payloadData;
 };
 
 export const createPedido = async (
@@ -265,8 +266,8 @@ export const createPedido = async (
     },
   });
 
-  const payloadData = (res.data as any)?.data ?? res.data;
-  return payloadData as PedidoItem;
+  const payloadData = extractPayload<PedidoItem>(res.data);
+  return payloadData;
 };
 
 export const updatePedidoEstado = async (
@@ -279,9 +280,9 @@ export const updatePedidoEstado = async (
     },
   });
 
-  const payloadData = (res.data as any)?.data ?? res.data;
-  return payloadData as PedidoItem;
-}; 
+  const payloadData = extractPayload<PedidoItem>(res.data);
+  return payloadData;
+};
 
 export const getCurrentDelivery = async (): Promise<CurrentDeliveryItem | null> => {
   const res = await api.get("/api/v1/pedidos/admin/domiciliarios/current", {
@@ -290,11 +291,11 @@ export const getCurrentDelivery = async (): Promise<CurrentDeliveryItem | null> 
     },
   });
 
-  const payloadData = (res.data as any)?.data ?? res.data;
+  const payloadData = extractPayload<CurrentDeliveryItem | null>(res.data);
 
   if (!payloadData) return null;
 
-  return payloadData as CurrentDeliveryItem;
+  return payloadData;
 };
 
 

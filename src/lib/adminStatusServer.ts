@@ -1,4 +1,6 @@
 
+import { extractPayload } from "./apiUtils";
+
 export interface AdminStatus {
   hasAdmin: boolean;
   adminName?: string | null;
@@ -18,10 +20,7 @@ export async function fetchAdminStatus(): Promise<AdminStatus> {
 
   const raw = await res.json();
 
-  const payload =
-    raw && typeof raw === "object" && "data" in raw && raw.data
-      ? (raw as any).data
-      : raw;
+  const payload = extractPayload<AdminStatus>(raw);
 
   const hasAdmin = Boolean(payload?.hasAdmin);
   const adminName =

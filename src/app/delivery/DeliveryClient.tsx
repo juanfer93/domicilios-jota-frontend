@@ -19,10 +19,10 @@ export function DeliveryClient({ adminName }: { adminName: string }) {
 		setTab
 	} = useDeliveryStore();
 
-	useEffect(() => {
-		setTab("today");
-		loadPedidosHoy();
-	}, [token]);
+        useEffect(() => {
+                setTab("today");
+                loadPedidosHoy();
+        }, [loadPedidosHoy, setTab, token]);
 
 	const pedidosPorDomiciliario = useMemo(() => {
 		const map = new Map<string, typeof pedidosHoy>();

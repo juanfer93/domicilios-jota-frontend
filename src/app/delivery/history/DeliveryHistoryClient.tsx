@@ -21,9 +21,9 @@ export function DeliveryHistoryClient({ adminName }: { adminName: string }) {
   } = useDeliveryStore();
 
   useEffect(() => {
-		setTab("history");
+                setTab("history");
     loadPedidosHistorial();
-  }, [token]);
+  }, [loadPedidosHistorial, setTab, token]);
 
   const countByEstado = useMemo(() => {
     const c = { "En proceso": 0, "Hecho": 0, "Cancelado": 0 };
