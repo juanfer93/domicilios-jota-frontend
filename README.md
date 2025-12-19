@@ -34,3 +34,21 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Notificaciones push y claves VAPID
+
+1. Genera un par de claves VAPID:
+   ```bash
+   pnpm vapid:generate
+   # o npm run vapid:generate
+   ```
+   El comando imprime la clave pública y la privada.
+
+2. Coloca la clave pública en tu entorno del frontend:
+   ```
+   NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY=TU_CLAVE_PUBLICA_VAPID
+   ```
+
+3. Guarda la clave privada únicamente en el backend y úsala para enviar notificaciones Web Push a las suscripciones guardadas.
+
+4. El frontend registra automáticamente el Service Worker y crea/recupera la suscripción push para el domiciliario. Necesitas persistir esa suscripción en el backend (endpoint + keys) y disparar el envío cuando se asigne un pedido.

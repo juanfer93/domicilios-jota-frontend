@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ensureBrowserNotificationPermission,
+  ensurePushSubscription,
   notifyNewPedidoBrowser,
 } from "@/lib/notifications";
 import { getCurrentDelivery } from "@/lib/api";
@@ -14,7 +15,7 @@ type NewPedidoState = {
   createdAt: number;
 } | null;
 
-const POLL_INTERVAL_MS = 3000; 
+const POLL_INTERVAL_MS = 3000;
 
 export function NewPedidoNotification() {
   const router = useRouter();
@@ -81,6 +82,7 @@ export function NewPedidoNotification() {
   useEffect(() => {
     if (!isDomiciliario) return;
     ensureBrowserNotificationPermission();
+    ensurePushSubscription();
   }, [isDomiciliario]);
 
   if (!pedido) return null;
