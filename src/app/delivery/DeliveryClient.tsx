@@ -4,7 +4,7 @@ import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useDeliveryStore } from "@/store/useDeliveryStore";
 import { useAuthStore } from "@/store/UseAuthStore";
-import type { PedidoEstado } from "@/lib/api"; 
+import type { PedidoEstado } from "@/lib/api";
 
 export function DeliveryClient({ adminName }: { adminName: string }) {
 	const router = useRouter();
@@ -19,10 +19,10 @@ export function DeliveryClient({ adminName }: { adminName: string }) {
 		setTab
 	} = useDeliveryStore();
 
-        useEffect(() => {
-                setTab("today");
-                loadPedidosHoy();
-        }, [loadPedidosHoy, setTab, token]);
+	useEffect(() => {
+		setTab("today");
+		loadPedidosHoy();
+	}, [loadPedidosHoy, setTab, token]);
 
 	const pedidosPorDomiciliario = useMemo(() => {
 		const map = new Map<string, typeof pedidosHoy>();

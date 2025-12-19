@@ -17,11 +17,11 @@ export function DeliveryHistoryClient({ adminName }: { adminName: string }) {
     error,
     clearError,
     loadPedidosHistorial,
-		setTab
+    setTab,
   } = useDeliveryStore();
 
   useEffect(() => {
-                setTab("history");
+    setTab("history");
     loadPedidosHistorial();
   }, [loadPedidosHistorial, setTab, token]);
 
@@ -30,6 +30,19 @@ export function DeliveryHistoryClient({ adminName }: { adminName: string }) {
     for (const p of pedidosHistorial) c[p.estado as keyof typeof c] += 1;
     return c;
   }, [pedidosHistorial]);
+
+  const formatBogotaDateTime = (iso?: string | null) => {
+    if (!iso) return "—";
+    return new Intl.DateTimeFormat("es-CO", {
+      timeZone: "America/Bogota",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    }).format(new Date(iso));
+  };
 
   return (
     <div className="min-h-screen bg-[#FFF9E8]">
@@ -113,7 +126,10 @@ export function DeliveryHistoryClient({ adminName }: { adminName: string }) {
           ) : (
             <div className="space-y-3">
               {pedidosHistorial.map((p) => (
-                <div key={p.id} className="rounded-2xl border border-black/10 bg-white p-4">
+                <div
+                  key={p.id}
+                  className="rounded-2xl border border-black/10 bg-white p-4"
+                >
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-[#030303ff]">
                     <span className="font-extrabold text-[#174A8B]">
                       {p.comercio?.nombre ?? p.comercio_id}
@@ -135,6 +151,18 @@ export function DeliveryHistoryClient({ adminName }: { adminName: string }) {
                     <span className="opacity-60">·</span>
                     <span>
                       Estado: <span className="font-extrabold">{p.estado}</span>
+                    </span>
+                  </div>
+
+                  <div className="mt-2 text-xs text-[#030303ff]/70">
+                    Creado:{" "}
+                    <span className="font-semibold">
+                      {formatBogotaDateTime(p.created_at)}
+                    </span>
+                    {" · "}
+                    Asignado:{" "}
+                    <span className="font-semibold">
+                      {formatBogotaDateTime(p.assigned_at)}
                     </span>
                   </div>
 

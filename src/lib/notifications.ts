@@ -1,7 +1,7 @@
 export const NOTIFICATION_TITLE = "Nuevo pedido";
 
 const SERVICE_WORKER_PATH = "/sw.js";
-const PUSH_PUBLIC_KEY = process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY;
+const PUSH_PUBLIC_KEY = process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY ?? "";
 
 function canUseBrowserNotifications() {
   return typeof window !== "undefined" && "Notification" in window;
@@ -23,23 +23,16 @@ export async function ensureBrowserNotificationPermission(): Promise<
   return Notification.permission;
 }
 
-export async function notifyNewPedidoBrowser(pedidoId: string) {
-  if (!canUseBrowserNotifications()) return;
+export function notifyNewPedidoBrowser(pedidoId: string) {
+  if (typeof window === "undefined" || !("Notification" in window)) return;
+  if (Notification.permission !== "granted") return;
 
-  const permission = await ensureBrowserNotificationPermission();
-  if (permission !== "granted") return;
-
-  const notification = new Notification(NOTIFICATION_TITLE, {
+  new Notification(NOTIFICATION_TITLE, {
     body: "Toca para ver el pedido en curso.",
     tag: `pedido-${pedidoId}`,
     icon: "/favicon.ico",
-  });
-
-  notification.onclick = (event) => {
-    event.preventDefault();
-    window.focus();
-    window.location.href = "/profile-delivery/current-delivery";
-  };
+    renotify: true,
+  } as NotificationOptions & { renotify?: boolean });
 }
 
 export async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
@@ -70,12 +63,12 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
 
   const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
+  const buffer = new ArrayBuffer(rawData.length);
+  const outputArray = new Uint8Array(buffer);
 
-  for (let i = 0; i < rawData.length; ++i) {
+  for (let i = 0; i < rawData.length; i++) {
     outputArray[i] = rawData.charCodeAt(i);
   }
-
   return outputArray;
 }
 
@@ -83,14 +76,14 @@ async function createPushSubscription(
   registration: ServiceWorkerRegistration
 ): Promise<PushSubscription | null> {
   if (!PUSH_PUBLIC_KEY) {
-    console.warn("Falta la variable de entorno NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY para suscribir push");
+    console.warn("Falta NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY para suscribir push");
     return null;
   }
 
   try {
     return await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(PUSH_PUBLIC_KEY),
+      applicationServerKey: urlBase64ToUint8Array(PUSH_PUBLIC_KEY) as BufferSource,
     });
   } catch (error) {
     console.error("No se pudo crear la suscripción push", error);
